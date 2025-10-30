@@ -1,6 +1,8 @@
 from utils.point import Point
+from utils.creature import Creature
 import pygame
 import sys
+import math
 
 pygame.init()
 
@@ -10,7 +12,7 @@ HEIGHT = 500
 RADIUS = 5
 DISTANCE = 20
 MOVE_SPEED = 1
-MAX_SPEED = 5
+MAX_SPEED = 4
 #-----------
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -18,53 +20,48 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 running = True
 
-points = []
-creature = [18,23,25,25,23,20,18,15,11,6,4,2,1]
-
-for i, e in enumerate(creature):
-    if i == 0:
-        points.append(Point(e, WIDTH / 2, HEIGHT / 2, None, DISTANCE))
-    else:
-        points.append(Point(e, WIDTH / 2, HEIGHT / 2, points[i-1], DISTANCE))
+creature1 = [18,23,25,25,23,20,18,15,11,6,4,2,1]
+creature2 = [18,5,20,25,25,20,5,5,5,5,5,5]
 
 movement_x = 0
 movement_y = 0
 
+creatures = [Creature([18,23,25,25,23,20,18,15,11,6,4,2,1], WIDTH / 2, HEIGHT / 2)]
+# creatures = [Creature([20,20], WIDTH / 2, HEIGHT / 2)]
+
 while running:
     screen.fill((0,0,0))
+
     keys = pygame.key.get_pressed()
     movement_x *= 0.95
     movement_y *= 0.95
+    movement = math.sqrt(pow(movement_x, 2) + pow(movement_y, 2))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                prev_point = points[-1]
-                points.append(Point(RADIUS, prev_point.get_coord()[0], prev_point.get_coord()[1], prev_point, DISTANCE))
-                print("Point created!")
-                print(points)
-                points[1].get_info()
+    
+    # if movement < MAX_SPEED:
+    #     mouse_pos = pygame.mouse.get_pos()
+    #     pos_creature = creatures[0].pos_head()
+    #     dx = mouse_pos[0] - pos_creature[0]
+    #     dy = mouse_pos[1] - pos_creature[1]
+    #     if abs(dx) > 1e-5:
+    #         movement_x += math.copysign(1, dx) * MOVE_SPEED
+    #     if abs(dy) > 1e-5:
+    #         movement_y += math.copysign(1, dy) * MOVE_SPEED
 
-    if keys[pygame.K_LEFT] and movement_x > -MAX_SPEED:
+    if keys[pygame.K_LEFT] and movement < MAX_SPEED:
         movement_x -= MOVE_SPEED
-    if keys[pygame.K_RIGHT] and movement_x < MAX_SPEED:
+    if keys[pygame.K_RIGHT] and movement < MAX_SPEED:
         movement_x += MOVE_SPEED
-    if keys[pygame.K_UP] and movement_y > -MAX_SPEED:
+    if keys[pygame.K_UP] and movement < MAX_SPEED:
         movement_y -= MOVE_SPEED
-    if keys[pygame.K_DOWN] and movement_y < MAX_SPEED:
+    if keys[pygame.K_DOWN] and movement < MAX_SPEED:
         movement_y += MOVE_SPEED
 
-    points[0].change_coord(movement_x, movement_y)
-
-
-    points[0].draw_point(screen)
-    if len(points) > 1:
-        for point in points[1:]:
-            point.update()
-            point.draw_point(screen)
-            # point.get_info()
+    for creature in creatures:
+        creature.update(screen, movement_x, movement_y)
 
     pygame.display.flip()
     clock.tick(60)

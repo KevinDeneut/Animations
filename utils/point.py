@@ -10,7 +10,7 @@ class Point:
             self.x = predecessor.get_coord()[0] + distance
         else:
             self.x = x
-            
+
         self.radius = radius
         self.y = y
         self.predecessor = predecessor
@@ -18,6 +18,9 @@ class Point:
 
     def get_coord(self):
         return (self.x, self.y)
+    
+    def get_pred(self):
+        return self.predecessor
     
     def change_coord(self, x, y):
         self.x += x
@@ -30,7 +33,7 @@ class Point:
     def update(self):
         if self.predecessor == None:
             return
-    
+
         (x_pred, y_pred) = self.predecessor.get_coord() 
 
         dx = self.x - x_pred
